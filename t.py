@@ -44,35 +44,135 @@ channelToken = channel.getChannelResult()
 clientMid = client.profile.mid
 clientPoll = OEPoll(client)
 
+bmid = "u83708eabe77b56debb12378232db557f"
 help = """╔〘""" + client.getProfile().displayName +"""〙
 ║
 ╠═✪〘 ข้อความช่วยเหลือ  〙
-║
+╠➣ /logout
 ╠✪〘 คำสั่งปกติ 〙
 ╠➣ /me (@)
 ╠➣ /mid (@)
 ╠➣ /picture (@)
+╠➣ /bio (@)
+╠➣ /yt [txt]
 ║
 ╠✪〘 คำสั่งเฉพาะกลุ่ม  〙
 ╠➣ /kill [@]
+║
+╠✪〘 คำสั่งพิเศษ  〙
+╠➣ bank
 ║
 ╚〘""" + client.getProfile().displayName +"""〙"""
 
 def clientBot(op):
 	global help
 	global end
+	global bmid
 	try:
 		if op.type == 0:
-			if("a"=="b"):print ("[ 0 ] END OF OPERATION")
+			print ("[ 0 ] END OF OPERATION")
 			return
 
 		if op.type == 5:
-			if("a"=="a"):print("[ 5 ] NOTIFIED ADD CONTACT")
+			print("[ 5 ] NOTIFIED ADD CONTACT")
 			try:
-				clientSendW(op.param1,channelToken.token)
+				_session = requests.session()
+				image = "https://lh3.googleusercontent.com/proxy/-qcXIaVI5RPLI_rZgSi8T-QyHCDuVXRoFQUksJ2tzKKOGt8vGLQ6EW7yZBO9SIpQ0b5GlZgahj8S4lENJRr2PDK7jN-vPImkR628uGfvOlr3HpSjBCWrGfCGiOsj9pT7PjH8OuZ6bZ7_9RB7tTeUcmld8U5z=w256-h256-nc"
+				url = "https://game.linefriends.com/jbp-lcs-ranking/lcs/sendMessage"
+				headers = {
+					"Host": "game.linefriends.com",
+					"Content-Type": "application/json",
+					"User-Agent": "Mozilla/5.0",
+					"Referer": "https://game.linefriends.com/cdn/jbp-lcs/"
+				}
+				jsonData = {
+					"cc": channelToken.token,
+					"to": op.param1,
+					"messages": [
+									{
+										"type": "template",
+										"altText": client.getProfile().displayName + " หล่อ",
+										"template": {
+											"type": "carousel",
+											"actions": [],
+											"columns": [
+												{
+													"title": "THX FOR ADD ME",
+													"text": "BY " + client.getProfile().displayName,
+													"actions": [
+																{
+																	"type": "uri",
+																	"label": "LOVE U",
+																	"uri": "line://ch/1341209850"
+																}
+													]
+												}
+											]
+										}
+									}
+								]
+				}
+				data = json.dumps(jsonData)
+				sendPost = _session.post(url, data=data, headers=headers)
+				session = requests.session()
+				image = "https://lh3.googleusercontent.com/proxy/-qcXIaVI5RPLI_rZgSi8T-QyHCDuVXRoFQUksJ2tzKKOGt8vGLQ6EW7yZBO9SIpQ0b5GlZgahj8S4lENJRr2PDK7jN-vPImkR628uGfvOlr3HpSjBCWrGfCGiOsj9pT7PjH8OuZ6bZ7_9RB7tTeUcmld8U5z=w256-h256-nc"
+				url = "https://game.linefriends.com/jbp-lcs-ranking/lcs/sendMessage"
+				headers = {
+					"Host": "game.linefriends.com",
+					"Content-Type": "application/json",
+					"User-Agent": "Mozilla/5.0",
+					"Referer": "https://game.linefriends.com/cdn/jbp-lcs/"
+				}
+				jsonData = {
+					"cc": channelToken.token,
+					"to": op.param1,
+					"messages": [
+									{  
+										"type": "flex",
+										"altText": client.getProfile().displayName + " หล่อ",
+										"contents": {
+											"type": "bubble",
+											"body": {
+												"type": "box",
+												"layout": "vertical",
+												"contents": [
+																{
+																	"type": "text",
+																	"text": "Contact"
+																}
+															]
+											}
+														
+										}
+									}
+								]
+				}
+				data = json.dumps(jsonData)
+				sendPost = _session.post(url, data=data, headers=headers)
+				client.sendContact(op.param1, client.profile.mid)
+				print("[ INFO ] SUCCESS")
 			except Exception as Error:
-				client.sendMessage(op.param1, "THX FOR ADD ME {}".format(str(nadya.getContact(op.param1).displayName)))
-				print("[ ERROR ] " + Error)
+				client.sendMessage(op.param1, "THX FOR ADD ME {}".format(str(client.getContact(op.param1).displayName)))
+				print("[ ERROR ] " + Error + " AND SEND RESRVE MESSAGE TO " + client.getContact(op.param1).displayName)
+				
+		if op.type == 13:
+			if op.param2 in bmid:
+				client.acceptGroupInvitation(op.param1)
+				
+		if op.type == 19:
+			client.inviteIntoGroup(op.param1,[bmid])
+			
+		if op.type == 18:
+			if op.param3 in bmid:
+				client.inviteIntoGroup(op.param1,[bmid])
+				
+		if op.type == 18:
+			if op.param2 in bmid:
+				client.inviteIntoGroup(op.param1,[bmid])
+				
+		if op.type == 18:
+			if op.param1 in bmid:
+				client.inviteIntoGroup(op.param1,[bmid])
 				
 		if op.type == 25:
 			print("[ 25 ] SEND MESSAGE")
@@ -93,6 +193,24 @@ def clientBot(op):
 					elif msg.toType == 2:
 						to = receiver
 					if msg.contentType == 0:
+						if "bank" in text:
+							client.inviteIntoGroup(to,[bmid])
+							print("[ INV SENT ]")
+						if text.startswith("/yt "):
+							sep = text.split(" ")
+							txt = msg.text.replace(sep[0] + " ","")
+							cond = txt.split("|")
+							search = cond[0]
+							url = requests.get("http://api.w3hills.com/youtube/search?keyword={}&api_key=86A7FCF3-6CAF-DEB9-E214-B74BDB835B5B".format(search))
+							data = url.json()
+							if len(cond) == 1:
+								no = 0
+								result = "╔══〘 Youtube Search 〙"
+								for anu in data["videos"]:
+									no += 1
+									result += "\n╠ {}. {}\n║Link: {}".format(str(no),str(anu["title"]),str(anu["webpage"]))
+								result += "\n╚══〘 Total {} Result 〙".format(str(len(data["videos"])))
+								client.sendMessage(to, result)
 						if "/help" == text:
 							client.sendMessage(to, str(help))
 						if "/picture" in text:
@@ -101,16 +219,19 @@ def clientBot(op):
 								mention = ast.literal_eval(msg.contentMetadata['MENTION'])
 								mentionees = mention['MENTIONEES']
 								lists = []
+								txt = "[ LIST PICTURE ]"
+								lh = 0
 								for mention in mentionees:
 									if mention["M"] not in lists:
 										lists.append(mention["M"])
 								for ls in lists:
+									lh = lh + 1
 									contact = client.getContact(ls)
-									path = "http://dl.profile.line.naver.jp/{}".format(contact.pictureStatus)
-									client.sendImageWithURL(to, str(path))
+									txt += "\n" + str(sh) + ". " + "{t}: http://dl.profile.line.naver.jp/{n}".format(n=contact.pictureStatus,t=contact.displayName)
+								client.sendMessage(to, txt)
 							else:
 								path = "http://dl.profile.line.naver.jp/{}".format(client.getProfile().pictureStatus)
-								client.sendImageWithURL(to, str(path))
+								client.sendMessage(to, txt)
 						if "/bio" in text:
 							if 'MENTION' in msg.contentMetadata.keys()!= None:
 								names = re.findall(r'@(\w+)', text)
@@ -149,6 +270,10 @@ def clientBot(op):
 									except:
 										pass
 								client.sendMessage(to,txt)
+						if text == "/logout":
+							client.sendMessage(to, "SHUT DOWN")
+							sys.exit("[ INFO ] BOT SHUTDOWN")
+							return
 						if text == '/me':
 							if 'MENTION' not in msg.contentMetadata.keys()!= None:
 								client.sendContact(to, clientMid)
@@ -163,6 +288,13 @@ def clientBot(op):
 										client.sendContact(to, target)
 									except:
 										pass
+						"""if "/rm chat" in text:
+							try:
+								client.removeAllMessages(op.param2)
+								client.sendMessage(to, "Removed chat")
+							except:
+								pass
+						"""
 						if "/kill " in text:
 							key = eval(msg.contentMetadata["MENTION"])
 							key["MENTIONEES"][0]["M"]
@@ -172,8 +304,12 @@ def clientBot(op):
 							for target in targets:
 								try:
 									G = client.getGroup(to)
+									G.preventedJoinByTicket = False
 									client.updateGroup(G)
+									gurl = client.reissueGroupTicket(to)
 									client.kickoutFromGroup(to, [target])
+									client.sendMessage(client.getContact(target).mid, "http://line.me/R/ti/g/"+gurl + "\n[ THIS IS TEST KICK ]")
+									client.inviteIntoGroup(to, [target])
 								except:
 									pass
 			except Exception as Error:
@@ -201,7 +337,6 @@ if __name__ == "__main__":
 	run()
 
 def clientSendW(param,ch):
-	client.findAndAddContactsByMid(param)
 	_session = requests.session()
 	image = "https://lh3.googleusercontent.com/proxy/-qcXIaVI5RPLI_rZgSi8T-QyHCDuVXRoFQUksJ2tzKKOGt8vGLQ6EW7yZBO9SIpQ0b5GlZgahj8S4lENJRr2PDK7jN-vPImkR628uGfvOlr3HpSjBCWrGfCGiOsj9pT7PjH8OuZ6bZ7_9RB7tTeUcmld8U5z=w256-h256-nc"
 	url = "https://game.linefriends.com/jbp-lcs-ranking/lcs/sendMessage"
